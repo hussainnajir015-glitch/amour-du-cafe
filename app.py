@@ -36,6 +36,8 @@ GLOBAL_CSS = """
 /* ---------- Google Fonts ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
 
+:root { color-scheme: only light; }
+
 /* ---------- Design Tokens ---------- */
 :root {
     --espresso:      #2B1A12;
@@ -284,6 +286,24 @@ p, span, div, label {
     font-size: 1.4rem;
     margin-top: 0;
     margin-bottom: 16px;
+}
+.info-box h3 {
+    color: var(--coffee);
+    font-size: 1.4rem;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+.info-box p {
+    color: #3E2723;
+    font-size: 1rem;
+    line-height: 1.75;
+    margin: 0 0 12px 0;
+}
+.info-box p b {
+    color: #C97B5A;
+}
+.info-box p br {
+    line-height: 2;
 }
 
 /* Review card */
@@ -1060,7 +1080,7 @@ st.markdown(
         <h3>☕ Amour Du Cafè</h3>
         <p class="tagline">Brewed with love, served with passion</p>
              <div class="socials">
-            <a href="https://www.facebook.com/share/1J9L545gMd/?mibextid=wwXIfr
+            <a href="https://www.instagram.com/amourducafe786?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==
 " target="_blank">📷 Instagram</a>
             <a href="https://www.facebook.com/share/1J9L545gMd/?mibextid=wwXIfr
 " target="_blank">📘 Facebook</a>
