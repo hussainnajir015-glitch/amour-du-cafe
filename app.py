@@ -1,12 +1,14 @@
 """
-Amour Du Cafè — Premium Dark Café Website (v3)
-================================================
-Dark theme · Page backgrounds · Animated counters
-Deployed on Streamlit Community Cloud.
+Amour Du Cafè — Premium Dark Café Website (v6 — Final with Video Tile)
+=======================================================================
+Dark theme · Page backgrounds · Animated counters · 74 menu items
+Gallery video tile (Sweet Bites) · Deployed on Streamlit Community Cloud.
 """
 
 from datetime import date, time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+import base64
+from pathlib import Path
 
 import streamlit as st
 import streamlit.components.v1 as components
@@ -22,14 +24,45 @@ st.set_page_config(
 )
 
 # ---------------------------------------------------------------------------
-# 2. GLOBAL STYLES — Dark Edition with Page Backgrounds
+# 2. GLOBAL STYLES
 # ---------------------------------------------------------------------------
 GLOBAL_CSS = """
 <style>
 /* ---------- Google Fonts ---------- */
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Italianno&display=swap');
 
-:root { color-scheme: dark; }
+/* ---------- DARK MODE LOCK ---------- */
+:root { 
+    color-scheme: dark only;
+    forced-color-adjust: none;
+}
+@media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
+    html, body, .stApp {
+        background-color: #0A0806 !important;
+        color: #FFFFFF !important;
+    }
+}
+[data-testid="stAppViewContainer"],
+[data-testid="stHeader"],
+[data-testid="stMain"],
+[data-testid="stSidebar"],
+section.main,
+.main {
+    background-color: transparent !important;
+    color: #FFFFFF !important;
+}
+[data-testid="stMarkdownContainer"],
+[data-testid="stMarkdownContainer"] *,
+.stMarkdown, .stMarkdown *,
+.stText, .stText *,
+p, span, div, label, h1, h2, h3, h4, h5, h6 {
+    color: #FFFFFF !important;
+}
+html { filter: none !important; -webkit-filter: none !important; }
+[data-theme="light"], [data-theme="light"] body, [data-theme="light"] .stApp {
+    background: #0A0806 !important;
+    color: #FFFFFF !important;
+}
 
 /* ---------- Design Tokens ---------- */
 :root {
@@ -49,7 +82,6 @@ GLOBAL_CSS = """
     --terracotta:    #C97B5A;
     --terracotta-dk: #A85E3D;
     --sage:          #8FA07A;
-    --rose:          #C88A8A;
     --shadow-sm:     0 4px 14px rgba(0, 0, 0, 0.4);
     --shadow-md:     0 10px 30px rgba(0, 0, 0, 0.5);
     --shadow-lg:     0 20px 50px rgba(0, 0, 0, 0.6);
@@ -69,7 +101,7 @@ GLOBAL_CSS = """
 [data-testid="stStatusWidget"],
 [data-testid="stHeader"] { display: none; }
 
-/* ---------- Base / Body — Fixed dark background with subtle texture ---------- */
+/* ---------- Base ---------- */
 html, body, [class*="css"] {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
     color: var(--white);
@@ -77,11 +109,7 @@ html, body, [class*="css"] {
     -moz-osx-font-smoothing: grayscale;
 }
 .stApp {
-    background:
-        radial-gradient(ellipse at 12% 8%, rgba(212, 160, 86, 0.10), transparent 50%),
-        radial-gradient(ellipse at 88% 92%, rgba(201, 123, 90, 0.08), transparent 50%),
-        linear-gradient(160deg, #0A0806 0%, #121010 50%, #0A0806 100%);
-    background-attachment: fixed;
+    background: transparent !important;
     color: var(--white);
 }
 .block-container {
@@ -89,14 +117,6 @@ html, body, [class*="css"] {
     padding-bottom: 2rem;
     max-width: 1320px;
 }
-
-/* Force all general text to white */
-.stApp p, .stApp span, .stApp div, .stApp label,
-.stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp h6 {
-    color: var(--white);
-}
-.stApp .stMarkdown { color: var(--white); }
-.stApp [data-testid="stMarkdownContainer"] * { color: inherit; }
 
 /* ---------- Typography ---------- */
 h1, h2, h3, h4 {
@@ -126,12 +146,7 @@ body, .stApp {
     transition: width 0.1s ease-out;
 }
 
-/* ============================================================
-   PAGE BACKGROUND WRAPPERS — unique image per page
-   Each page uses a fixed full-viewport background overlay
-   ============================================================ */
-
-/* ----- PAGE BACKGROUND: HOME ----- */
+/* ---------- PAGE BACKGROUNDS ---------- */
 .page-bg-home {
     position: fixed;
     top: 0; left: 0;
@@ -142,8 +157,6 @@ body, .stApp {
         url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1920&q=80') center/cover fixed;
     pointer-events: none;
 }
-
-/* ----- PAGE BACKGROUND: MENU ----- */
 .page-bg-menu {
     position: fixed;
     top: 0; left: 0;
@@ -154,8 +167,6 @@ body, .stApp {
         url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1920&q=80') center/cover fixed;
     pointer-events: none;
 }
-
-/* ----- PAGE BACKGROUND: REVIEWS ----- */
 .page-bg-reviews {
     position: fixed;
     top: 0; left: 0;
@@ -166,8 +177,6 @@ body, .stApp {
         url('https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=1920&q=80') center/cover fixed;
     pointer-events: none;
 }
-
-/* ----- PAGE BACKGROUND: CONTACT ----- */
 .page-bg-contact {
     position: fixed;
     top: 0; left: 0;
@@ -179,10 +188,7 @@ body, .stApp {
     pointer-events: none;
 }
 
-/* Keep the app background transparent so page backgrounds show through */
-.stApp { background: transparent !important; }
-
-/* ---------- Hero — Dark Cinematic ---------- */
+/* ---------- Hero ---------- */
 .hero {
     position: relative;
     background:
@@ -213,13 +219,10 @@ body, .stApp {
     66%      { transform: translate(15px, -15px) rotate(-3deg); }
 }
 .hero-content { position: relative; z-index: 2; }
-
 .hero-logo {
     display: block;
     max-width: 140px;
     max-height: 140px;
-    width: auto;
-    height: auto;
     margin: 0 auto 22px auto;
     border-radius: 50%;
     filter: drop-shadow(0 10px 30px rgba(212, 160, 86, 0.5));
@@ -236,7 +239,6 @@ body, .stApp {
     from { opacity: 0; transform: translateY(-20px) scale(0.95); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-
 .hero .eyebrow {
     display: inline-block;
     color: var(--gold-light);
@@ -353,22 +355,30 @@ body, .stApp {
     font-weight: 500;
 }
 
-/* ---------- Cards ---------- */
-.card {
-    background: var(--black-card);
-    border-radius: var(--radius-md);
-    padding: 28px;
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition);
-    height: 100%;
-    border: 1px solid var(--border-soft);
-    color: var(--white);
-    backdrop-filter: blur(10px);
+/* ---------- Sub-category Headers ---------- */
+.sub-category {
+    margin: 22px 0 18px 0;
+    padding-left: 14px;
+    position: relative;
+    border-left: 3px solid var(--gold);
 }
-.card:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--border);
+.sub-category h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.35rem;
+    color: var(--gold-light);
+    margin: 0;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 16px rgba(212, 160, 86, 0.35);
+    font-weight: 600;
+}
+.sub-category::after {
+    content: "";
+    position: absolute;
+    bottom: -8px;
+    left: 14px;
+    width: 40px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
 }
 
 /* ---------- Menu card ---------- */
@@ -431,6 +441,13 @@ body, .stApp {
     background: rgba(212, 160, 86, 0.10);
     border-radius: var(--radius-pill);
     border: 1px solid var(--border);
+}
+.menu-card .price.ask-us {
+    color: var(--white-muted);
+    font-size: 1rem;
+    font-style: italic;
+    background: rgba(184, 176, 168, 0.10);
+    border-color: var(--border-soft);
 }
 
 /* ---------- Info box ---------- */
@@ -641,6 +658,20 @@ body, .stApp {
     text-shadow: 1px 2px 10px rgba(0,0,0,0.9);
     color: var(--white);
 }
+
+/* ---------- Video tile support ---------- */
+.gallery-tile video {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    border-radius: inherit;
+}
+.gallery-tile.has-video::after {
+    background: linear-gradient(180deg, transparent 40%, rgba(10, 8, 6, 0.85) 100%);
+}
+
 .grad-1 { background: linear-gradient(135deg, #6B3A28, #2A1A12); }
 .grad-2 { background: linear-gradient(135deg, #3E4A30, #1A1F14); }
 .grad-3 { background: linear-gradient(135deg, #8C6A2E, #3A2410); }
@@ -690,7 +721,7 @@ body, .stApp {
     color: inherit !important;
 }
 
-/* ---------- Form Inputs (Dark) ---------- */
+/* ---------- Form Inputs ---------- */
 .stTextInput > div > div > input,
 .stTextArea > div > div > textarea,
 .stSelectbox > div > div > div {
@@ -726,14 +757,16 @@ body, .stApp {
     padding-bottom: 8px;
     justify-content: center;
     background: transparent;
+    flex-wrap: wrap;
 }
 .stTabs [data-baseweb="tab"] {
     background: rgba(26, 22, 20, 0.7);
     backdrop-filter: blur(8px);
     border-radius: var(--radius-pill);
-    padding: 9px 22px;
+    padding: 10px 26px;
     font-family: 'Poppins', sans-serif;
     font-weight: 500;
+    font-size: 0.95rem;
     color: var(--white-muted);
     transition: var(--transition);
     border: 1px solid var(--border-soft);
@@ -978,7 +1011,7 @@ hr { border-color: var(--border-soft); }
     .menu-card .price { align-self: flex-end; }
     .footer { padding: 40px 20px 30px 20px; }
     .stButton > button { padding: 11px 20px; font-size: 0.88rem; }
-    .stTabs [data-baseweb="tab"] { padding: 7px 14px; font-size: 0.85rem; }
+    .stTabs [data-baseweb="tab"] { padding: 7px 14px; font-size: 0.82rem; }
     .gallery-tile {
         max-width: 100%;
         aspect-ratio: 1 / 1;
@@ -995,12 +1028,11 @@ st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
 
 
 # ---------------------------------------------------------------------------
-# 3. SCROLL PROGRESS + ANIMATED COUNTERS (reliable version)
+# 3. SCROLL PROGRESS + ANIMATED COUNTERS
 # ---------------------------------------------------------------------------
 components.html(
     """
     <script>
-    // ---------- Scroll progress bar ----------
     (function attachProgress() {
         const doc = window.parent.document;
         let bar = doc.querySelector('.scroll-progress');
@@ -1009,7 +1041,6 @@ components.html(
             bar.className = 'scroll-progress';
             doc.body.appendChild(bar);
         }
-        const scrollEl = doc.querySelector('.main') || doc.scrollingElement;
         const update = () => {
             const h = doc.documentElement;
             const top = h.scrollTop || doc.body.scrollTop;
@@ -1022,16 +1053,13 @@ components.html(
         update();
     })();
 
-    // ---------- Animated counters ----------
     function animateCounter(el) {
         if (el.dataset.done) return;
         el.dataset.done = 'true';
-
         const target = parseFloat(el.dataset.target) || 0;
         const suffix = el.dataset.suffix || '';
         const decimals = parseInt(el.dataset.decimals || '0');
 
-        // Special case: ratings like 4.9
         if (target < 10 && decimals > 0) {
             let current = 0;
             const steps = 40;
@@ -1046,24 +1074,20 @@ components.html(
             return;
         }
 
-        // Normal case: 7, 25000, 50
         let current = 0;
         const duration = 1500;
         const start = performance.now();
         const tick = (now) => {
             const t = Math.min((now - start) / duration, 1);
-            const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+            const eased = 1 - Math.pow(1 - t, 3);
             current = target * eased;
-
             if (target >= 1000) {
                 el.textContent = Math.floor(current).toLocaleString() + suffix;
             } else {
                 el.textContent = Math.floor(current) + suffix;
             }
-
-            if (t < 1) {
-                requestAnimationFrame(tick);
-            } else {
+            if (t < 1) requestAnimationFrame(tick);
+            else {
                 el.textContent = (target >= 1000
                     ? Math.floor(target).toLocaleString()
                     : Math.floor(target)) + suffix;
@@ -1082,27 +1106,11 @@ components.html(
         });
     }
 
-    // Scan on scroll + on load (with delays to catch rendered content)
     const doc = window.parent.document;
     doc.addEventListener('scroll', scanAndAnimate, { passive: true });
     setTimeout(scanAndAnimate, 500);
     setTimeout(scanAndAnimate, 1200);
     setTimeout(scanAndAnimate, 2500);
-
-    // Also use IntersectionObserver for reliability
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) animateCounter(entry.target);
-        });
-    }, { threshold: 0.1 });
-
-    const observeAll = () => {
-        doc.querySelectorAll('.stat-item .num[data-target]').forEach((el) => {
-            observer.observe(el);
-        });
-    };
-    setTimeout(observeAll, 500);
-    setTimeout(observeAll, 1500);
     </script>
     """,
     height=0,
@@ -1113,41 +1121,115 @@ components.html(
 # 4. STATIC DATA
 # ---------------------------------------------------------------------------
 @st.cache_data(show_spinner=False)
-def get_menu_data() -> Dict[str, List[Tuple[str, str, float]]]:
+def get_menu_data():
     return {
-        "Coffee": [
-            ("Espresso", "Bold and pure", 200.00),
-            ("Cappuccino", "Classic Italian style", 250.00),
-            ("Café Latte", "Smooth and creamy", 200.00),
-            ("Café Amour", "Signature with rose & vanilla", 200.50),
-            ("Mocha Passion", "Chocolate espresso delight", 250.75),
-            ("Flat White", "Velvety microfoam", 240.50),
-            ("Iced Americano", "Refreshing and bold", 240.00),
-            ("Iced Rose Latte", "Floral and cool", 250.25),
-            ("Cold Brew", "Slow-steeped perfection", 240.75),
-            ("Frappé Amour", "Blended coffee bliss", 250.95),
+        "Appetizers": [
+            ("Dynamite Chicken", "Crispy chicken in spicy dynamite sauce", 350.00),
+            ("Dynamite Shrimps", "Juicy shrimp with creamy dynamite glaze", 650.00),
+            ("French Fries", "Golden crispy fries", 200.00),
+            ("Sausages (Chicken / Buff)", "Grilled sausages, your choice", 240.00),
         ],
-        "Tea & Others": [
-            ("Earl Grey", "Classic bergamot", 75.50),
-            ("Chamomile Dream", "Calming herbal blend", 80.75),
-            ("Matcha Latte", "Japanese ceremonial grade", 15.50),
-            ("Chai Latte", "Spiced and warming", 40.75),
-            ("Hot Chocolate", "Belgian chocolate", 140.50),
-            ("Fresh Orange Juice", "Freshly squeezed", 140.00),
+        "Mo : Mo": [
+            ("Steam Momo (Buff / Chicken)", "Classic steamed dumplings", 170.00),
+            ("Fried Momo (Buff / Chicken)", "Golden pan-fried dumplings", 200.00),
+            ("Chilly Momo (Buff / Chicken)", "Spicy tossed with peppers", 250.00),
+            ("Jhol Momo (Buff / Chicken)", "In warm spiced soup broth", 200.00),
+            ("Kothey Momo (Buff / Chicken)", "Pan-seared, juicy inside", 300.00),
         ],
-        "Pastries": [
-            ("Butter Croissant", "Flaky and golden", 300.50),
-            ("Pain au Chocolat", "Chocolate filled", 345.00),
-            ("Blueberry Muffin", "Bursting with berries", 50.75),
-            ("Cinnamon Roll", "Warm and gooey", 240.25),
-            ("Almond Danish", "Toasted almonds", 240.00),
+        "Spicy Zone": [
+            ("Ramen Bowl", "Hearty Japanese-style noodle bowl", 700.00),
+            ("Hot & Spicy Wings (3 pcs)", "Fiery buffalo-glazed wings", 350.00),
+            ("Hot & Spicy Wings (5 pcs)", "Fiery buffalo-glazed wings — large", 450.00),
         ],
-        "Desserts": [
-            ("Tiramisu", "Classic Italian", 60.50),
-            ("Crème Brûlée", "French elegance", 160.75),
-            ("Chocolate Lava Cake", "Warm molten center", 170.00),
-            ("Cheesecake", "New York style", 260.25),
-            ("Macarons (3 pcs)", "Assorted flavors", 15.50),
+        "Brunch": [
+            ("Cheese Poached Egg", "Poached eggs with hollandaise & cheese", 300.00),
+            ("Blueberry Smoothie Bowl", "Chilled berry bowl with toppings", 200.00),
+            ("Croissant Chicken & Cheese", "Flaky croissant with chicken & cheese", 300.00),
+            ("Strawberry Parfait", "Layered yogurt, berries & granola", 200.00),
+        ],
+        "Italian Corner": [
+            ("Penne Alfredo", "Creamy white sauce pasta", 400.00),
+            ("Penne Arrabiata", "Spicy tomato pasta", 300.00),
+            ("Penne Pesto", "Basil pesto pasta", 450.00),
+            ("Chicken Pizza", "Wood-fired with grilled chicken", 650.00),
+            ("Veg Pizza", "Fresh garden vegetables", 600.00),
+            ("Mixed Pizza", "Loaded with chicken & veggies", 800.00),
+        ],
+        "Sandwiches & Rolls": [
+            ("Croque Monsieur", "Classic French grilled ham & cheese", 300.00),
+            ("Mexican Chicken Wrap", "Zesty wrap with Mexican spices", 350.00),
+            ("Chicken Roll", "Wrapped with tender chicken", 230.00),
+            ("Egg Roll", "Crispy roll with egg filling", 200.00),
+            ("Keema Roll", "Spiced minced meat roll", 220.00),
+            ("Cheese Sandwich", "Grilled with melted cheese", 250.00),
+        ],
+        "Burger Joint": [
+            ("Buff Smash Burger", "Juicy smashed buff patty", 300.00),
+            ("Zinger Chicken Burger", "Crispy spicy chicken fillet", 300.00),
+            ("Devil's Chicken Burger", "Fiery chicken burger", 450.00),
+        ],
+        "Espresso Based Drinks": [
+            ("Espresso", "Bold and pure", 120.00),
+            ("Americano", "Smooth black coffee", 150.00),
+            ("Cafe Latte", "Smooth and creamy", 180.00),
+            ("Cappuccino", "Classic Italian style", 180.00),
+            ("Cortado", "Equal parts espresso & milk", 180.00),
+            ("Cafe Mocha", "Chocolate espresso delight", 250.00),
+            ("Flat White", "Velvety microfoam", 200.00),
+        ],
+        "Hot Flavored Drinks": [
+            ("Flavored Cafe Latte", "Latte with your choice of flavor", 250.00),
+            ("Latte Macchiato", "Layered milk & espresso", 230.00),
+            ("Americano Royale", "Premium americano", 220.00),
+            ("Tiramisu Latte", "Dessert-inspired latte", 300.00),
+            ("Hot Chocolate", "Belgian chocolate", 180.00),
+        ],
+        "Amour's Signature": [
+            ("Caramel Sticky Mocha", "Our signature caramel mocha", 300.00),
+        ],
+        "Iced Coffee": [
+            ("Iced Americano", "Refreshing and bold", 150.00),
+            ("Iced Latte", "Chilled smooth latte", 180.00),
+            ("Iced Mocha", "Chilled chocolate espresso", 250.00),
+            ("Iced Tiramisu Latte", "Dessert-inspired iced latte", 300.00),
+            ("Iced Strawberry Latte", "Strawberry-infused iced latte", 250.00),
+            ("Espresso Shakerato", "Shaken espresso over ice", 150.00),
+        ],
+        "Slow Bar — Nepali Specialty Coffee": [
+            ("Washed", "Nepali washed process", 250.00),
+            ("Honey", "Nepali honey process", 300.00),
+            ("Natural", "Nepali natural process", 300.00),
+            ("Anaerobic", "Nepali anaerobic fermentation", 300.00),
+        ],
+        "Slow Bar — Specialty Coffee Around The World": [
+            ("Washed", "Washed process — international", 500.00),
+            ("Honey", "Honey process — international", 550.00),
+            ("Natural", "Natural process — international", 550.00),
+            ("Anaerobic", "Anaerobic fermentation — international", 550.00),
+        ],
+        "Coffee Alternatives": [
+            ("Peach Iced Tea", "Refreshing peach tea", 200.00),
+            ("Lemon Iced Tea", "Zesty lemon iced tea", 200.00),
+            ("Apple Iced Tea", "Crisp apple iced tea", 200.00),
+            ("Hot Lemon With Honey", "Warm soothing classic", 100.00),
+        ],
+        "Mojitos": [
+            ("Virgin Mojito", "Classic mint & lime", 200.00),
+            ("Strawberry Mojito", "Sweet strawberry twist", 250.00),
+            ("Passionfruit Mojito", "Tropical passionfruit", 280.00),
+            ("Blue Lagoon Mojito", "Vibrant blue citrus", 250.00),
+        ],
+        "Smoothies": [
+            ("Passion Mango Smoothie", "Tropical mango blend", None),
+            ("Passion Breeze", "Refreshing fruit blend", None),
+            ("Pina Colada", "Pineapple & coconut", None),
+        ],
+        "Matcha Menu": [
+            ("Matcha Latte", "Japanese ceremonial grade", 200.00),
+            ("Mango Matcha Latte", "Matcha with mango", 250.00),
+            ("Strawberry Matcha", "Matcha with strawberry", 250.00),
+            ("Coconut Matcha", "Matcha with coconut", 250.00),
+            ("Spanish Matcha Latte", "Spanish-style matcha", 250.00),
         ],
     }
 
@@ -1160,9 +1242,6 @@ def get_signature_specials() -> List[Dict[str, str]]:
         {"icon": "🍫", "name": "Mocha Passion", "desc": "Rich dark chocolate blended with premium espresso.", "price": "NPR 250.75"},
     ]
 
-
-import base64
-from pathlib import Path
 
 IMAGES_DIR = Path(__file__).parent / "images"
 
@@ -1180,14 +1259,24 @@ def img_to_base64(filename: str) -> str:
 
 
 @st.cache_data(show_spinner=False)
+def video_to_base64(filename: str) -> str:
+    path = IMAGES_DIR / filename
+    if not path.exists():
+        return ""
+    with open(path, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode()
+    return f"data:video/mp4;base64,{encoded}"
+
+
+@st.cache_data(show_spinner=False)
 def get_gallery_items() -> List[Dict[str, str]]:
     return [
-        {"label": "Cozy Corners",  "filename": "gallery_1.jpg", "grad": "grad-1"},
-        {"label": "Artisan Brews", "filename": "gallery_2.jpg", "grad": "grad-2"},
-        {"label": "Sweet Bites",   "filename": "gallery_3.jpg", "grad": "grad-3"},
-        {"label": "Morning Light", "filename": "gallery_4.jpg", "grad": "grad-4"},
-        {"label": "Evening Vibes", "filename": "gallery_5.jpg", "grad": "grad-5"},
-        {"label": "Our Baristas",  "filename": "gallery_6.jpg", "grad": "grad-6"},
+        {"label": "Cozy Corners",  "filename": "gallery_1.jpg", "grad": "grad-1", "type": "image"},
+        {"label": "Artisan Brews", "filename": "gallery_2.jpg", "grad": "grad-2", "type": "image"},
+        {"label": "Sweet Bites",   "filename": "sweetbites.mp4", "grad": "grad-3", "type": "video"},
+        {"label": "Morning Light", "filename": "gallery_4.jpg", "grad": "grad-4", "type": "image"},
+        {"label": "Evening Vibes", "filename": "gallery_5.jpg", "grad": "grad-5", "type": "image"},
+        {"label": "Our Baristas",  "filename": "gallery_6.jpg", "grad": "grad-6", "type": "image"},
     ]
 
 
@@ -1210,10 +1299,9 @@ if "reviews" not in st.session_state:
 
 
 # ---------------------------------------------------------------------------
-# 6. REUSABLE UI HELPERS
+# 6. HELPERS
 # ---------------------------------------------------------------------------
 def set_page_background(page: str) -> None:
-    """Inject the correct page background based on current page."""
     bg_class_map = {
         "Home": "page-bg-home",
         "Menu": "page-bg-menu",
@@ -1274,6 +1362,30 @@ def render_navbar() -> None:
 
 
 def render_gallery_tile(item: Dict[str, str]) -> None:
+    is_video = item.get("type") == "video"
+
+    if is_video:
+        video_uri = video_to_base64(item["filename"]) if item.get("filename") else ""
+        if video_uri:
+            st.markdown(
+                f'''
+                <div class="gallery-tile has-video" style="position: relative;">
+                    <video autoplay muted loop playsinline>
+                        <source src="{video_uri}" type="video/mp4">
+                    </video>
+                    <span>{item["label"]}</span>
+                </div>
+                ''',
+                unsafe_allow_html=True,
+            )
+        else:
+            css_class = f"gallery-tile {item.get('grad', 'grad-3')}"
+            st.markdown(
+                f'<div class="{css_class}"><span>{item["label"]}</span></div>',
+                unsafe_allow_html=True,
+            )
+        return
+
     data_uri = img_to_base64(item["filename"]) if item.get("filename") else ""
     if data_uri:
         style = f"background-image: url('{data_uri}');"
@@ -1293,7 +1405,6 @@ def render_gallery_tile(item: Dict[str, str]) -> None:
 def render_home() -> None:
     section_header("Welcome to Amour Du Cafè", "A love letter to the art of coffee", kicker="Our Story")
 
-    # --- Animated Stats Bar ---
     st.markdown(
         """
         <div class="stats-bar">
@@ -1306,7 +1417,7 @@ def render_home() -> None:
                 <span class="lbl">Cups Served</span>
             </div>
             <div class="stat-item">
-                <span class="num" data-target="50" data-suffix="+">50+</span>
+                <span class="num" data-target="74" data-suffix="+">74</span>
                 <span class="lbl">Menu Items</span>
             </div>
             <div class="stat-item">
@@ -1404,42 +1515,75 @@ def render_menu() -> None:
 
     search = st.text_input(
         "🔍  Search for a dish or drink…",
-        placeholder="e.g. latte, croissant, matcha",
+        placeholder="e.g. latte, momo, pizza, mojito",
         label_visibility="collapsed",
     )
 
     menu = get_menu_data()
-    tabs = st.tabs([f"{icon}  {name}" for icon, name in [
-        ("☕", "Coffee"), ("🍵", "Tea & Others"), ("🥐", "Pastries"), ("🍰", "Desserts"),
-    ]])
 
-    for tab, category in zip(tabs, menu.keys()):
+    GROUPED_MENU = {
+        "🍽️  Food": [
+            "Appetizers", "Mo : Mo", "Spicy Zone", "Brunch",
+            "Italian Corner", "Sandwiches & Rolls", "Burger Joint",
+        ],
+        "☕  Coffee": [
+            "Espresso Based Drinks", "Hot Flavored Drinks", "Amour's Signature",
+            "Iced Coffee", "Slow Bar — Nepali Specialty Coffee",
+            "Slow Bar — Specialty Coffee Around The World",
+        ],
+        "🍹  Cold & More": [
+            "Coffee Alternatives", "Mojitos", "Smoothies", "Matcha Menu",
+        ],
+    }
+
+    tabs = st.tabs(list(GROUPED_MENU.keys()))
+
+    for tab, (group_name, categories) in zip(tabs, GROUPED_MENU.items()):
         with tab:
-            items = menu[category]
-            if search:
-                q = search.lower().strip()
-                items = [i for i in items if q in i[0].lower() or q in i[1].lower()]
+            any_results = False
 
-            if not items:
-                st.info("No items match your search. Try a different keyword.")
-                continue
+            for category in categories:
+                items = menu.get(category, [])
 
-            left, right = st.columns(2, gap="medium")
-            for idx, (name, desc, price) in enumerate(items):
-                target = left if idx % 2 == 0 else right
-                with target:
-                    st.markdown(
-                        f"""
-                        <div class="menu-card">
-                            <div class="menu-info">
-                                <h4>{name}</h4>
-                                <p>{desc}</p>
+                if search:
+                    q = search.lower().strip()
+                    items = [i for i in items if q in i[0].lower() or q in i[1].lower()]
+
+                if not items:
+                    continue
+
+                any_results = True
+
+                st.markdown(
+                    f'<div class="sub-category"><h3>{category}</h3></div>',
+                    unsafe_allow_html=True,
+                )
+
+                left, right = st.columns(2, gap="medium")
+                for idx, (name, desc, price) in enumerate(items):
+                    target = left if idx % 2 == 0 else right
+                    if price is not None:
+                        price_html = f'<span class="price">NPR {price:.2f}</span>'
+                    else:
+                        price_html = '<span class="price ask-us">Ask Us</span>'
+                    with target:
+                        st.markdown(
+                            f"""
+                            <div class="menu-card">
+                                <div class="menu-info">
+                                    <h4>{name}</h4>
+                                    <p>{desc}</p>
+                                </div>
+                                {price_html}
                             </div>
-                            <span class="price">NPR {price:.2f}</span>
-                        </div>
-                        """,
-                        unsafe_allow_html=True,
-                    )
+                            """,
+                            unsafe_allow_html=True,
+                        )
+
+                st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
+
+            if not any_results and search:
+                st.info("No items match your search. Try a different keyword.")
 
 
 def render_reviews() -> None:
@@ -1567,7 +1711,6 @@ def render_contact() -> None:
 # 8. MAIN ROUTER
 # ---------------------------------------------------------------------------
 set_page_background(st.session_state.page)
-
 render_hero()
 render_navbar()
 
