@@ -1,8 +1,9 @@
 """
-Amour Du Cafè — Premium Dark Café Website (v6 — Final with Video Tile)
-=======================================================================
-Dark theme · Page backgrounds · Animated counters · 74 menu items
-Gallery video tile (Sweet Bites) · Deployed on Streamlit Community Cloud.
+Amour Du Cafè — Premium Dark Café Website (v12 — Fully Responsive)
+====================================================================
+Dark theme · Coffee-making background video · Animated counters
+Mobile + laptop optimized · 74 menu items · Gallery video tile
+Deployed on Streamlit Community Cloud.
 """
 
 from datetime import date, time
@@ -36,11 +37,9 @@ GLOBAL_CSS = """
     color-scheme: dark only;
     forced-color-adjust: none;
 }
-@media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
-    html, body, .stApp {
-        background-color: #0A0806 !important;
-        color: #FFFFFF !important;
-    }
+html, body, .stApp {
+    background-color: #0A0806 !important;
+    color: #FFFFFF !important;
 }
 [data-testid="stAppViewContainer"],
 [data-testid="stHeader"],
@@ -59,19 +58,15 @@ p, span, div, label, h1, h2, h3, h4, h5, h6 {
     color: #FFFFFF !important;
 }
 html { filter: none !important; -webkit-filter: none !important; }
-[data-theme="light"], [data-theme="light"] body, [data-theme="light"] .stApp {
-    background: #0A0806 !important;
-    color: #FFFFFF !important;
-}
 
-/* ---------- Design Tokens ---------- */
+/* ---------- Design Tokens (Dark Mode) ---------- */
 :root {
     --black:         #0A0806;
     --black-soft:    #121010;
     --black-card:    #1A1614;
     --black-elev:    #221E1B;
-    --border:        rgba(212, 160, 86, 0.18);
-    --border-soft:   rgba(255, 255, 255, 0.06);
+    --border:        rgba(212, 160, 86, 0.25);
+    --border-soft:   rgba(255, 255, 255, 0.08);
     --white:         #FFFFFF;
     --white-soft:    #F5F5F5;
     --white-muted:   #B8B0A8;
@@ -82,11 +77,11 @@ html { filter: none !important; -webkit-filter: none !important; }
     --terracotta:    #C97B5A;
     --terracotta-dk: #A85E3D;
     --sage:          #8FA07A;
-    --shadow-sm:     0 4px 14px rgba(0, 0, 0, 0.4);
-    --shadow-md:     0 10px 30px rgba(0, 0, 0, 0.5);
-    --shadow-lg:     0 20px 50px rgba(0, 0, 0, 0.6);
-    --shadow-xl:     0 30px 70px rgba(0, 0, 0, 0.7);
-    --shadow-gold:   0 10px 40px rgba(212, 160, 86, 0.3);
+    --shadow-sm:     0 4px 14px rgba(0, 0, 0, 0.45);
+    --shadow-md:     0 10px 30px rgba(0, 0, 0, 0.55);
+    --shadow-lg:     0 20px 50px rgba(0, 0, 0, 0.65);
+    --shadow-xl:     0 30px 70px rgba(0, 0, 0, 0.75);
+    --shadow-gold:   0 10px 40px rgba(212, 160, 86, 0.30);
     --radius-sm:     12px;
     --radius-md:     18px;
     --radius-lg:     28px;
@@ -127,11 +122,13 @@ h1, h2, h3, h4 {
 }
 
 /* ---------- Custom Coffee Cursor ---------- */
-body, .stApp {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="%23D4A056" stroke="%230A0806" stroke-width="1.5"/><ellipse cx="13" cy="13" rx="3" ry="6" fill="%230A0806" opacity="0.6"/></svg>') 13 13, auto;
-}
-.stButton > button, a, .gallery-tile {
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><text y="22" font-size="20">☕</text></svg>') 15 15, pointer;
+@media (hover: hover) and (pointer: fine) {
+    body, .stApp {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 26 26"><circle cx="13" cy="13" r="8" fill="%23D4A056" stroke="%230A0806" stroke-width="1.5"/><ellipse cx="13" cy="13" rx="3" ry="6" fill="%230A0806" opacity="0.6"/></svg>') 13 13, auto;
+    }
+    .stButton > button, a, .gallery-tile {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><text y="22" font-size="20">☕</text></svg>') 15 15, pointer;
+    }
 }
 
 /* ---------- Scroll Progress Bar ---------- */
@@ -146,7 +143,7 @@ body, .stApp {
     transition: width 0.1s ease-out;
 }
 
-/* ---------- PAGE BACKGROUNDS ---------- */
+/* ---------- PAGE BACKGROUNDS (Dark Overlays) ---------- */
 .page-bg-home {
     position: fixed;
     top: 0; left: 0;
@@ -188,12 +185,9 @@ body, .stApp {
     pointer-events: none;
 }
 
-/* ---------- Hero ---------- */
+/* ---------- Hero with Video Background ---------- */
 .hero {
     position: relative;
-    background:
-        linear-gradient(135deg, rgba(10, 8, 6, 0.94) 0%, rgba(18, 16, 16, 0.90) 50%, rgba(10, 8, 6, 0.92) 100%),
-        url('https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=1600&q=80') center/cover;
     padding: 100px 40px 90px;
     border-radius: var(--radius-lg);
     text-align: center;
@@ -201,6 +195,39 @@ body, .stApp {
     overflow: hidden;
     box-shadow: var(--shadow-xl);
     border: 1px solid var(--border);
+    background: #0A0806;
+    min-height: 520px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.hero-video-wrap {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+}
+.hero-video-wrap video {
+    position: absolute;
+    top: 50%; left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    filter: saturate(1.1) brightness(0.75);
+}
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(135deg, rgba(10, 8, 6, 0.82) 0%, rgba(18, 16, 16, 0.70) 50%, rgba(10, 8, 6, 0.85) 100%),
+        radial-gradient(circle at 50% 50%, rgba(212, 160, 86, 0.15), transparent 60%);
+    z-index: 1;
+    pointer-events: none;
 }
 .hero::before {
     content: "";
@@ -208,17 +235,18 @@ body, .stApp {
     top: -60%; left: -60%;
     width: 220%; height: 220%;
     background:
-        radial-gradient(circle at 30% 40%, rgba(212, 160, 86, 0.25), transparent 45%),
-        radial-gradient(circle at 70% 70%, rgba(201, 123, 90, 0.20), transparent 45%);
+        radial-gradient(circle at 30% 40%, rgba(212, 160, 86, 0.20), transparent 45%),
+        radial-gradient(circle at 70% 70%, rgba(201, 123, 90, 0.15), transparent 45%);
     animation: float 18s ease-in-out infinite;
     pointer-events: none;
+    z-index: 2;
 }
 @keyframes float {
     0%, 100% { transform: translate(0, 0) rotate(0deg); }
     33%      { transform: translate(-20px, -25px) rotate(4deg); }
     66%      { transform: translate(15px, -15px) rotate(-3deg); }
 }
-.hero-content { position: relative; z-index: 2; }
+.hero-content { position: relative; z-index: 3; }
 .hero-logo {
     display: block;
     max-width: 140px;
@@ -227,7 +255,8 @@ body, .stApp {
     border-radius: 50%;
     filter: drop-shadow(0 10px 30px rgba(212, 160, 86, 0.5));
     animation: logoFade 1.4s ease-out;
-    border: 3px solid rgba(212, 160, 86, 0.5);
+    border: 3px solid rgba(212, 160, 86, 0.6);
+    background: rgba(10, 8, 6, 0.5);
 }
 .hero-logo-fallback {
     display: block;
@@ -247,13 +276,14 @@ body, .stApp {
     text-transform: uppercase;
     margin-bottom: 12px;
     font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 .hero h1 {
     color: var(--white);
     font-size: clamp(2.6rem, 6vw, 5rem);
     margin: 0;
     letter-spacing: 4px;
-    text-shadow: 0 4px 30px rgba(212, 160, 86, 0.4), 2px 6px 24px rgba(0, 0, 0, 0.8);
+    text-shadow: 0 4px 30px rgba(212, 160, 86, 0.4), 2px 6px 24px rgba(0, 0, 0, 0.9);
     font-weight: 800;
     line-height: 1.05;
 }
@@ -264,7 +294,7 @@ body, .stApp {
     display: block;
     margin: -8px 0 4px 0;
     letter-spacing: 1px;
-    text-shadow: 0 0 30px rgba(212, 160, 86, 0.6);
+    text-shadow: 0 0 30px rgba(212, 160, 86, 0.7);
     line-height: 1;
 }
 .hero .divider {
@@ -294,6 +324,7 @@ body, .stApp {
     letter-spacing: 1.5px;
     max-width: 640px;
     line-height: 1.6;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 .hero .badge {
     display: inline-block;
@@ -305,9 +336,31 @@ body, .stApp {
     font-size: 0.8rem;
     letter-spacing: 3px;
     text-transform: uppercase;
-    background: rgba(212, 160, 86, 0.10);
+    background: rgba(10, 8, 6, 0.65);
     backdrop-filter: blur(10px);
     font-weight: 500;
+}
+
+/* ---------- Scroll cue ---------- */
+.scroll-cue {
+    margin-top: 32px;
+    display: inline-block;
+    color: var(--gold-light);
+    font-size: 0.75rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    animation: bounce 2.2s ease-in-out infinite;
+    font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+}
+.scroll-cue .arrow {
+    display: block;
+    font-size: 1.2rem;
+    margin-top: 4px;
+}
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50%      { transform: translateY(8px); opacity: 0.7; }
 }
 
 /* ---------- Section Header ---------- */
@@ -323,7 +376,7 @@ body, .stApp {
     color: var(--gold);
     margin-bottom: -6px;
     line-height: 1;
-    text-shadow: 0 0 20px rgba(212, 160, 86, 0.4);
+    text-shadow: 0 0 20px rgba(212, 160, 86, 0.5);
 }
 .section-header h2 {
     font-size: clamp(1.7rem, 3.2vw, 2.5rem);
@@ -368,7 +421,7 @@ body, .stApp {
     color: var(--gold-light);
     margin: 0;
     letter-spacing: 1.5px;
-    text-shadow: 0 0 16px rgba(212, 160, 86, 0.35);
+    text-shadow: 0 0 16px rgba(212, 160, 86, 0.4);
     font-weight: 600;
 }
 .sub-category::after {
@@ -383,7 +436,7 @@ body, .stApp {
 
 /* ---------- Menu card ---------- */
 .menu-card {
-    background: linear-gradient(135deg, rgba(26, 22, 20, 0.85) 0%, rgba(34, 30, 27, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(26, 22, 20, 0.88) 0%, rgba(34, 30, 27, 0.88) 100%);
     backdrop-filter: blur(12px);
     border-radius: var(--radius-md);
     padding: 22px 26px;
@@ -452,7 +505,7 @@ body, .stApp {
 
 /* ---------- Info box ---------- */
 .info-box {
-    background: linear-gradient(160deg, rgba(26, 22, 20, 0.88) 0%, rgba(34, 30, 27, 0.88) 100%);
+    background: linear-gradient(160deg, rgba(26, 22, 20, 0.90) 0%, rgba(34, 30, 27, 0.90) 100%);
     backdrop-filter: blur(12px);
     padding: 36px;
     border-radius: var(--radius-md);
@@ -630,7 +683,7 @@ body, .stApp {
     align-items: flex-end;
     justify-content: flex-start;
     padding: 18px;
-    color: #FFF;
+    color: #FFFFFF;
     cursor: pointer;
     background-size: cover;
     background-position: center;
@@ -640,7 +693,7 @@ body, .stApp {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(180deg, transparent 30%, rgba(10, 8, 6, 0.9) 100%);
+    background: linear-gradient(180deg, transparent 30%, rgba(10, 8, 6, 0.90) 100%);
     z-index: 1;
 }
 .gallery-tile:hover {
@@ -655,7 +708,7 @@ body, .stApp {
     font-weight: 600;
     font-size: 1rem;
     letter-spacing: 0.5px;
-    text-shadow: 1px 2px 10px rgba(0,0,0,0.9);
+    text-shadow: 1px 2px 10px rgba(0, 0, 0, 0.9);
     color: var(--white);
 }
 
@@ -696,6 +749,8 @@ body, .stApp {
     position: relative;
     overflow: hidden;
     backdrop-filter: blur(8px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 .stButton > button::before {
     content: "";
@@ -719,6 +774,9 @@ body, .stApp {
 }
 .stButton > button p, .stButton > button span, .stButton > button div {
     color: inherit !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ---------- Form Inputs ---------- */
@@ -926,7 +984,7 @@ hr { border-color: var(--border-soft); }
     gap: 60px;
     flex-wrap: wrap;
     padding: 36px 24px;
-    background: linear-gradient(135deg, rgba(26, 22, 20, 0.9) 0%, rgba(34, 30, 27, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(26, 22, 20, 0.90) 0%, rgba(34, 30, 27, 0.90) 100%);
     backdrop-filter: blur(12px);
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
@@ -995,31 +1053,242 @@ hr { border-color: var(--border-soft); }
     background: var(--gold) !important;
 }
 
-/* ---------- Mobile ---------- */
+/* =========================================================== */
+/* ---------- TABLET & MOBILE (≤ 768px) ---------- */
+/* =========================================================== */
 @media (max-width: 768px) {
-    .block-container { padding-left: 1rem; padding-right: 1rem; }
-    .hero { padding: 60px 22px; border-radius: var(--radius-md); }
-    .hero h1 { letter-spacing: 2px; }
-    .section-header { margin: 42px 0 26px 0; }
-    .card, .info-box, .special-card { padding: 24px; }
+    /* Layout */
+    .block-container {
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+        padding-top: 0.5rem;
+    }
+
+    /* Hero — compact and readable */
+    .hero {
+        padding: 48px 18px 54px;
+        border-radius: var(--radius-md);
+        min-height: 400px;
+        margin-bottom: 20px;
+    }
+    .hero-logo {
+        max-width: 96px;
+        max-height: 96px;
+        margin-bottom: 14px;
+        border-width: 2px;
+    }
+    .hero-logo-fallback { font-size: 2.8rem; margin-bottom: 8px; }
+    .hero .eyebrow {
+        font-size: 0.62rem;
+        letter-spacing: 3px;
+        margin-bottom: 6px;
+    }
+    .hero h1 {
+        font-size: 2.1rem;
+        letter-spacing: 1.5px;
+        line-height: 1.15;
+    }
+    .hero .script { font-size: 1.6rem; margin: -4px 0 2px 0; }
+    .hero .divider { width: 80px; margin: 18px auto; }
+    .hero p { font-size: 0.95rem; letter-spacing: 1px; padding: 0 6px; }
+    .hero .badge {
+        font-size: 0.68rem;
+        letter-spacing: 2px;
+        padding: 8px 18px;
+        margin-top: 22px;
+    }
+    .scroll-cue { font-size: 0.62rem; letter-spacing: 3px; margin-top: 22px; }
+    .hero-overlay {
+        background:
+            linear-gradient(135deg, rgba(10, 8, 6, 0.72) 0%, rgba(18, 16, 16, 0.58) 50%, rgba(10, 8, 6, 0.75) 100%),
+            radial-gradient(circle at 50% 50%, rgba(212, 160, 86, 0.12), transparent 60%);
+    }
+
+    /* Section headers */
+    .section-header { margin: 36px 0 22px 0; }
+    .section-header .kicker { font-size: 1.3rem; }
+    .section-header h2 { font-size: 1.35rem; padding-bottom: 14px; }
+    .section-header h2::after { width: 50px; height: 2px; }
+    .section-header .subtitle { font-size: 0.82rem; letter-spacing: 1px; margin-top: 10px; }
+
+    /* Sub-category */
+    .sub-category { margin: 18px 0 14px 0; padding-left: 10px; border-left-width: 2px; }
+    .sub-category h3 { font-size: 1.05rem; letter-spacing: 0.8px; }
+    .sub-category::after { left: 10px; width: 30px; }
+
+    /* Cards */
     .menu-card {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
-        padding: 18px;
+        padding: 16px 18px;
+        border-radius: var(--radius-sm);
+        border-left-width: 3px;
     }
-    .menu-card .price { align-self: flex-end; }
-    .footer { padding: 40px 20px 30px 20px; }
-    .stButton > button { padding: 11px 20px; font-size: 0.88rem; }
-    .stTabs [data-baseweb="tab"] { padding: 7px 14px; font-size: 0.82rem; }
+    .menu-card .menu-info h4 { font-size: 1rem; }
+    .menu-card .menu-info p { font-size: 0.86rem; line-height: 1.5; }
+    .menu-card .price {
+        align-self: flex-end;
+        font-size: 0.98rem;
+        padding: 5px 12px;
+    }
+    .info-box { padding: 22px 20px; border-radius: var(--radius-sm); }
+    .info-box h3 { font-size: 1.15rem; margin-bottom: 12px; }
+    .info-box p { font-size: 0.92rem; line-height: 1.7; }
+    .review-card { padding: 20px 18px; border-radius: var(--radius-sm); }
+    .review-card::after { font-size: 3.5rem; top: 6px; right: 16px; }
+    .review-card .reviewer { font-size: 1rem; }
+    .review-card .stars { font-size: 1rem; letter-spacing: 2px; margin: 6px 0 10px 0; }
+    .review-card .review-text { font-size: 0.95rem; line-height: 1.6; }
+    .special-card { padding: 26px 18px; border-radius: var(--radius-sm); }
+    .special-card .icon { font-size: 2.2rem; margin-bottom: 10px; }
+    .special-card h3 { font-size: 1.1rem; }
+    .special-card p { font-size: 0.92rem; }
+    .special-card .price { font-size: 1rem; padding: 5px 14px; }
+
+    /* Stats bar — 2 x 2 grid instead of 4 in a row */
+    .stats-bar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px 12px;
+        padding: 26px 14px;
+        margin: 22px 0 8px 0;
+    }
+    .stat-item { min-width: 0; }
+    .stat-item .num { font-size: 1.6rem; margin-bottom: 4px; }
+    .stat-item .lbl { font-size: 0.66rem; letter-spacing: 1.4px; }
+
+    /* Marquee */
+    .marquee-strip { padding: 10px 0; margin: 26px 0 14px 0; border-radius: var(--radius-sm); }
+    .marquee-strip .inner { font-size: 0.78rem; letter-spacing: 2px; }
+    .marquee-strip .inner span { margin: 0 18px; }
+
+    /* Gallery — larger tiles */
     .gallery-tile {
         max-width: 100%;
         aspect-ratio: 1 / 1;
-        padding: 14px;
-        margin-bottom: 6px;
+        padding: 12px;
+        margin-bottom: 4px;
+        border-radius: var(--radius-sm);
     }
-    .stats-bar { gap: 30px; padding: 28px 18px; }
-    .stat-item .num { font-size: 1.8rem; }
+    .gallery-tile span { font-size: 0.82rem; }
+
+    /* Buttons — navbar fits 4 across */
+    .stButton > button {
+        padding: 10px 6px;
+        font-size: 0.78rem;
+        letter-spacing: 0;
+        border-radius: var(--radius-sm);
+    }
+    .stButton > button p {
+        font-size: 0.78rem !important;
+        letter-spacing: 0 !important;
+    }
+
+    /* Tabs — horizontal scroll */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 6px;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 6px;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+    .stTabs [data-baseweb="tab"] {
+        padding: 7px 14px;
+        font-size: 0.78rem;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* Inputs */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
+        font-size: 0.9rem !important;
+        padding: 8px 12px !important;
+    }
+    .stTextInput label, .stTextArea label, .stSelectbox label, .stSlider label {
+        font-size: 0.82rem !important;
+    }
+
+    /* Expander */
+    [data-testid="stExpander"] summary {
+        font-size: 0.88rem !important;
+        padding: 10px 12px !important;
+    }
+
+    /* Newsletter */
+    .newsletter-box { padding: 22px 16px; }
+    .newsletter-box h3 { font-size: 1.05rem; }
+    .newsletter-box p { font-size: 0.9rem; }
+
+    /* Footer */
+    .footer {
+        padding: 40px 18px 28px 18px;
+        margin-top: 46px;
+        border-radius: var(--radius-md);
+    }
+    .footer .script { font-size: 1.7rem; }
+    .footer h3 { font-size: 1.4rem; letter-spacing: 2px; }
+    .footer .tagline { font-size: 0.92rem; margin-bottom: 22px; }
+    .footer .socials { gap: 8px; margin-bottom: 22px; }
+    .footer .socials a { padding: 8px 14px; font-size: 0.78rem; }
+    .footer .copyright { font-size: 0.72rem; line-height: 1.5; }
+
+    /* Map */
+    .map-wrap { border-width: 3px; }
+}
+
+/* =========================================================== */
+/* ---------- SMALL PHONES (≤ 480px) ---------- */
+/* =========================================================== */
+@media (max-width: 480px) {
+    .block-container {
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+    }
+
+    .hero { padding: 40px 14px 44px; min-height: 360px; }
+    .hero-logo { max-width: 78px; max-height: 78px; margin-bottom: 10px; }
+    .hero h1 { font-size: 1.75rem; letter-spacing: 1px; }
+    .hero .script { font-size: 1.35rem; }
+    .hero .eyebrow { font-size: 0.55rem; letter-spacing: 2.5px; }
+    .hero p { font-size: 0.86rem; letter-spacing: 0.5px; }
+    .hero .badge { font-size: 0.6rem; padding: 6px 14px; letter-spacing: 1.5px; }
+    .hero .divider { width: 60px; margin: 14px auto; }
+    .hero .divider::before { font-size: 0.75rem; padding: 0 8px; }
+
+    .section-header h2 { font-size: 1.2rem; }
+    .section-header .kicker { font-size: 1.1rem; }
+
+    .stat-item .num { font-size: 1.4rem; }
+    .stat-item .lbl { font-size: 0.6rem; letter-spacing: 1.2px; }
+
+    .menu-card .menu-info h4 { font-size: 0.94rem; }
+    .menu-card .menu-info p { font-size: 0.8rem; }
+    .menu-card .price { font-size: 0.9rem; }
+
+    .info-box { padding: 18px 16px; }
+    .info-box h3 { font-size: 1.05rem; }
+    .info-box p { font-size: 0.86rem; }
+
+    .review-card { padding: 18px 16px; }
+    .review-card .review-text { font-size: 0.88rem; }
+
+    .gallery-tile span { font-size: 0.74rem; }
+
+    .footer h3 { font-size: 1.2rem; }
+    .footer .socials a { padding: 7px 12px; font-size: 0.72rem; }
+
+    /* Navbar even tighter */
+    .stButton > button {
+        padding: 8px 4px !important;
+        font-size: 0.7rem !important;
+    }
+    .stButton > button p {
+        font-size: 0.7rem !important;
+    }
 }
 </style>
 """
@@ -1268,6 +1537,10 @@ def video_to_base64(filename: str) -> str:
     return f"data:video/mp4;base64,{encoded}"
 
 
+# ---- Coffee background video (loaded AFTER the function is defined) ----
+COFFEE_BG_VIDEO_URL = video_to_base64("coffee.mp4")
+
+
 @st.cache_data(show_spinner=False)
 def get_gallery_items() -> List[Dict[str, str]]:
     return [
@@ -1322,15 +1595,25 @@ def section_header(title: str, subtitle: str = "", kicker: str = "") -> None:
 
 
 def render_hero() -> None:
+    """Hero with coffee-making background video."""
     logo_uri = img_to_base64("logo.jpg")
     logo_html = (
         f'<img src="{logo_uri}" class="hero-logo" alt="Amour Du Cafè logo">'
         if logo_uri
         else '<span class="hero-logo-fallback">☕</span>'
     )
+
+    video_src = COFFEE_BG_VIDEO_URL or "https://assets.mixkit.co/videos/preview/mixkit-barista-pouring-coffee-into-a-cup-42886-large.mp4"
+
     st.markdown(
         f"""
         <div class="hero">
+            <div class="hero-video-wrap">
+                <video autoplay="true" muted="true" loop="true" playsinline="true" preload="auto">
+                    <source src="{video_src}" type="video/mp4">
+                </video>
+            </div>
+            <div class="hero-overlay"></div>
             <div class="hero-content">
                 {logo_html}
                 <span class="eyebrow">Est. with love · Damauli, Nepal</span>
@@ -1339,6 +1622,10 @@ def render_hero() -> None:
                 <div class="divider"></div>
                 <p>Where every cup tells a story of love and passion</p>
                 <span class="badge">☕ Handcrafted Daily · 100% Arabica</span>
+                <div class="scroll-cue">
+                    Scroll to explore
+                    <span class="arrow">↓</span>
+                </div>
             </div>
         </div>
         """,
@@ -1347,16 +1634,17 @@ def render_hero() -> None:
 
 
 def render_navbar() -> None:
+    """Compact navbar that fits 4 buttons on mobile."""
     nav_items = [
-        ("🏠  Home",    "Home"),
-        ("📋  Menu",    "Menu"),
-        ("⭐  Reviews", "Reviews"),
-        ("📍  Contact", "Contact"),
+        ("🏠", "Home"),
+        ("📋", "Menu"),
+        ("⭐", "Reviews"),
+        ("📍", "Contact"),
     ]
     cols = st.columns(len(nav_items))
-    for col, (label, key) in zip(cols, nav_items):
+    for col, (icon, key) in zip(cols, nav_items):
         with col:
-            if st.button(label, key=f"nav_{key}", use_container_width=True):
+            if st.button(f"{icon} {key}", key=f"nav_{key}", use_container_width=True):
                 st.session_state.page = key
                 st.rerun()
 
@@ -1370,7 +1658,7 @@ def render_gallery_tile(item: Dict[str, str]) -> None:
             st.markdown(
                 f'''
                 <div class="gallery-tile has-video" style="position: relative;">
-                    <video autoplay muted loop playsinline>
+                    <video autoplay="true" muted="true" loop="true" playsinline="true">
                         <source src="{video_uri}" type="video/mp4">
                     </video>
                     <span>{item["label"]}</span>
@@ -1522,16 +1810,16 @@ def render_menu() -> None:
     menu = get_menu_data()
 
     GROUPED_MENU = {
-        "🍽️  Food": [
+        "🍽️ Food": [
             "Appetizers", "Mo : Mo", "Spicy Zone", "Brunch",
             "Italian Corner", "Sandwiches & Rolls", "Burger Joint",
         ],
-        "☕  Coffee": [
+        "☕ Coffee": [
             "Espresso Based Drinks", "Hot Flavored Drinks", "Amour's Signature",
             "Iced Coffee", "Slow Bar — Nepali Specialty Coffee",
             "Slow Bar — Specialty Coffee Around The World",
         ],
-        "🍹  Cold & More": [
+        "🍹 Cold": [
             "Coffee Alternatives", "Mojitos", "Smoothies", "Matcha Menu",
         ],
     }
